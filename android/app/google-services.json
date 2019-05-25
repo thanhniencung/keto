@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "253380717523",
+    "firebase_url": "https://keto-d9404.firebaseio.com",
+    "project_id": "keto-d9404",
+    "storage_bucket": "keto-d9404.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253380717523:android:131ae4940c50111f",
+        "android_client_info": {
+          "package_name": "com.code4func.keto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "253380717523-5vitqqtah8ubebssdflhlv1v28k58agu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv5a6GR4Vs3mByFSZ-mWFMlDoySORAoS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "253380717523-5vitqqtah8ubebssdflhlv1v28k58agu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
