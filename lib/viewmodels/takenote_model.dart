@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class TakeNoteModel extends ChangeNotifier {
   static List<String>  _types = ["Outcome", "Income"];
@@ -8,15 +9,22 @@ class TakeNoteModel extends ChangeNotifier {
   String _currentCate;
   String _currentLabelCate;
   String _errorMsg;
+  String _done;
   String _currentType = _types[0];
+  bool _isSubmitingData = false;
 
   String get getCurrentCate => _currentCate;
   String get getCurrentType => _currentType;
   String get getDescription => _description;
   String get getErrorMsg => _errorMsg;
+  bool get isSubmitingData => _isSubmitingData;
 
   List<String> get getTypes => _types;
 
+  static TakeNoteModel of(BuildContext context) {
+    return Provider.of<TakeNoteModel>(context);
+  }
+  
   Stream<QuerySnapshot> syncCateList() {
     return Firestore.instance.collection('cate').snapshots();
   }
@@ -39,6 +47,10 @@ class TakeNoteModel extends ChangeNotifier {
     _currentCate = newItem;
   }
 
+  void currentCateLabel(String newItem) {
+    _currentLabelCate = newItem;
+  }
+
   void description(String newItem) {
     _description = newItem;
   }
@@ -50,7 +62,7 @@ class TakeNoteModel extends ChangeNotifier {
       _errorMsg = "Please fill in all fields";
     }
 
-    if (_description.length < 10) {
+    if (_description.length < 6) {
       _errorMsg = "Description too short";
     }
 
@@ -61,19 +73,25 @@ class TakeNoteModel extends ChangeNotifier {
 
   void save() {
     print("add data to firestore");
+    _isSubmitingData = true;
+    notifyListeners();
 
     Firestore.instance
     .collection('transactions')
     .add({
-      "cateId": "1",
-      "cateName": "Shopping",
-      "type": "Outcome", // income or outcome
+      "cateId": _currentCate,
+      "cateName": _currentLabelCate,
+      "type": _currentType, // income or outcome
       "icon": "assets/images/shopping_bag.png"
     })
     .then((result) => {
-      _description = ""
+      _isSubmitingData = false,
+      notifyListeners()
     })
-    .catchError((err) => _errorMsg = "Internal error");
+    .catchError((err) => {
+      _errorMsg = "Internal error",
+      _isSubmitingData = false,
+      notifyListeners()
+    });
   }
-
 }

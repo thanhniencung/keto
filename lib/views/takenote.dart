@@ -3,6 +3,7 @@ import 'package:keto/shared/app_color.dart';
 import 'package:provider/provider.dart';
 import 'package:keto/viewmodels/takenote_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:progress_indicators/progress_indicators.dart';
 
 class TakeNote extends StatelessWidget {
 
@@ -56,7 +57,7 @@ class _TakeNodeState extends State<TakeNodeStateFulWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final model = Provider.of<TakeNoteModel>(context);
+    final model = TakeNoteModel.of(context);
 
     return SingleChildScrollView(
         child: new Container(
@@ -104,6 +105,7 @@ class _TakeNodeState extends State<TakeNodeStateFulWidget> {
                         DocumentSnapshot docs = snapshot.data.documents[0];
                         if (model.getCurrentCate == null) {
                           model.currentCate(docs["cateId"].toString());
+                          model.currentCateLabel(docs["cateName"].toString());
                         }
 
                         return DropdownButton(
@@ -140,7 +142,7 @@ class _TakeNodeState extends State<TakeNodeStateFulWidget> {
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
                   height: 50,
-                  child: TextField(
+                  child: TextFormField(
                     controller: txtController,
                     decoration: new InputDecoration(
                       labelText: "Description",
@@ -162,7 +164,15 @@ class _TakeNodeState extends State<TakeNodeStateFulWidget> {
 
                     if (model.getErrorMsg != null) {
                       Scaffold.of(context).showSnackBar(new SnackBar(
+                        duration: const Duration(milliseconds: 1000),
                         content: new Text(model.getErrorMsg),
+                        backgroundColor: Colors.red,
+                      ));
+                    } else {
+                      txtController.clear();
+                      Scaffold.of(context).showSnackBar(new SnackBar(
+                        content: new Text("Save sucessfully"),
+                        backgroundColor: primary,
                       ));
                     }
                   },
@@ -180,6 +190,13 @@ class _TakeNodeState extends State<TakeNodeStateFulWidget> {
                     ),
                   ),
                 ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: 12,
+                ),
+                model.isSubmitingData
+                ? ScalingText('Submiting...')
+                : Text(""),
               ],
             ),
           ),
