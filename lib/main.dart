@@ -29,8 +29,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-
 class HomeStateFulWidget extends StatefulWidget {
   HomeStateFulWidget({Key key}) : super(key: key);
 
@@ -38,10 +36,6 @@ class HomeStateFulWidget extends StatefulWidget {
   _HomeStateFulWidgetState createState() => _HomeStateFulWidgetState();
 }
 
-/*
-https://grokonez.com/flutter/flutter-firestore-example-firebase-firestore-crud-operations-with-listview
-https://grokonez.com/android/how-to-integrate-flutter-firebase-tutorial-app-android-studio
- */
 TabController _tabController;
 class _HomeStateFulWidgetState extends State<HomeStateFulWidget> with SingleTickerProviderStateMixin {
 
