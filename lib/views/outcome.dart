@@ -1,68 +1,88 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../shared/app_color.dart';
+import 'package:keto/shared/app_color.dart';
+import 'package:keto/viewmodels/outcome_model.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 
 class Outcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       backgroundColor: backgroundGray,
-      body: IncomeWidget(),
+      body: ChangeNotifierProvider<OutcomeModel>(
+        builder: (_) => OutcomeModel(),
+        child: OutcomeWidget(),
+      ),
     );
   }
 }
 
-class IncomeWidget extends StatefulWidget {
+class OutcomeWidget extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _IncomeStateWidget();
+    return _OutcomeStateWidget();
   }
 }
 
-class _IncomeStateWidget extends State<IncomeWidget> {
-
-  final List<String> entries = <String>["1", "1", "1", "1", "1", "1", "1", "1"];
-
+class _OutcomeStateWidget extends State<OutcomeWidget> {
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemCount: entries.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Container(
-          padding: EdgeInsets.all(9.5),
-          child: Row(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(right: 12.0),
-                child: new Image.asset('assets/images/shopping_bag.png',
-                  width: 50.0,
-                  height: 50.0,
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "Shopping",
-                    style: TextStyle(color: Colors.black,fontSize: 16, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.left,
-                    textDirection: TextDirection.rtl,
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 5.0),
-                    child: Text(
-                      "Buy a new t-shirt",
-                      style: TextStyle(color: Colors.black,fontSize: 15),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-      separatorBuilder: (context, index) {
-        return Divider();
-      },
+    final model = OutcomeModel.of(context);
+
+    return StreamBuilder<QuerySnapshot>(
+        stream: model.syncIncomeTransactions(),
+        builder: (context, snapshot) {
+
+          if (snapshot.hasError) {
+            return showEmptyView(snapshot.error.toString());
+          }
+
+          switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return Center(child: CircularProgressIndicator());
+
+              case ConnectionState.none:
+                return showEmptyView("Empty transaction");
+
+              default:
+              if (snapshot.data.documents.isEmpty) {
+                return showEmptyView("Empty transaction");
+              }
+              return new ListView.builder(
+                  itemCount: snapshot.data.documents.length ,
+                  itemBuilder: (context, index) {
+                    final DocumentSnapshot document = snapshot.data.documents[index];
+
+                    FlutterMoneyFormatter fmf = FlutterMoneyFormatter(amount: document['amount']);
+                    MoneyFormatterOutput fo = fmf.output;
+
+                    return  new Card(
+                        child: new ListTile(
+                          onTap:null,
+                          leading: new CircleAvatar(
+                            backgroundColor: Colors.blue,
+                            child: new Image.asset(document['icon']),
+                          ),
+                          title: Row(
+                            children: <Widget>[
+                              Text(document['cateName']),
+                              Text("  -${fo.compactNonSymbol}", style: TextStyle(fontSize: 13, color: Colors.red, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          subtitle: Text(document['des']),
+                        )
+                    );
+                  }
+              );
+          }
+        }
+    );
+  }
+
+  Widget showEmptyView(msg) {
+    return Center(
+      child: Text(msg),
     );
   }
 }

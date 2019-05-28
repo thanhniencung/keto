@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'views/takenote.dart';
+
 import 'main.dart';
+import 'views/takenote.dart';
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {

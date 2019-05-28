@@ -1,5 +1,5 @@
-import 'package:flutter/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class TakeNoteModel extends ChangeNotifier {
@@ -9,7 +9,7 @@ class TakeNoteModel extends ChangeNotifier {
   String _currentCate;
   String _currentLabelCate;
   String _errorMsg;
-  String _done;
+  String _amount;
   String _currentType = _types[0];
   bool _isSubmitingData = false;
 
@@ -24,7 +24,7 @@ class TakeNoteModel extends ChangeNotifier {
   static TakeNoteModel of(BuildContext context) {
     return Provider.of<TakeNoteModel>(context);
   }
-  
+
   Stream<QuerySnapshot> syncCateList() {
     return Firestore.instance.collection('cate').snapshots();
   }
@@ -43,16 +43,22 @@ class TakeNoteModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void currentCate(String newItem) {
+  set currentCate(String newItem) {
     _currentCate = newItem;
   }
 
-  void currentCateLabel(String newItem) {
+  set currentCateLabel(String newItem) {
     _currentLabelCate = newItem;
   }
 
-  void description(String newItem) {
+  set description(String newItem) {
     _description = newItem;
+  }
+
+  String get amount => _amount;
+
+  set amount(String value) {
+    _amount = value;
   }
 
   void validateAndSubmit() {
@@ -60,15 +66,22 @@ class TakeNoteModel extends ChangeNotifier {
 
     if (_description == null || _currentCate == null || _currentType == null) {
       _errorMsg = "Please fill in all fields";
+      return;
+    }
+
+    var amountNumber = double.tryParse(_amount) ?? 0;
+    print("fsdfsdf");
+    if (amountNumber == 0) {
+      _errorMsg = "Amount is missing";
+      return;
     }
 
     if (_description.length < 6) {
       _errorMsg = "Description too short";
+      return;
     }
 
-    if (_errorMsg == null) {
-      save();
-    }
+    save();
   }
 
   void save() {
@@ -82,7 +95,10 @@ class TakeNoteModel extends ChangeNotifier {
       "cateId": _currentCate,
       "cateName": _currentLabelCate,
       "type": _currentType, // income or outcome
-      "icon": "assets/images/shopping_bag.png"
+      "icon": "assets/images/shopping_bag.png",
+      "amount": double.parse(_amount),
+      "des": _description,
+      "timestamp": FieldValue.serverTimestamp(),
     })
     .then((result) => {
       _isSubmitingData = false,

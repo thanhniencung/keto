@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+
+import 'router.dart';
 import 'shared/app_color.dart';
 import 'views/dashboard.dart';
 import 'views/income.dart';
 import 'views/outcome.dart';
-import 'router.dart';
 
 void main() => runApp(MyApp());
 
