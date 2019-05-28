@@ -75,6 +75,10 @@ class _TakeNodeState extends State<TakeNodeStateFulWidget> {
                       stream: model.syncCateList(),
                       builder: (context, snapshot){
 
+                        if (!snapshot.hasData) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+
                         switch (snapshot.connectionState) {
                           case ConnectionState.waiting:
                             return Center(child: CircularProgressIndicator());
